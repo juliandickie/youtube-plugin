@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "youtube-plugin"
+version = "0.1.0"
+description = "Read YouTube for voice-of-customer research and channel work"
+requires-python = ">=3.11"
+dependencies = []
+authors = [{ name = "Julian Dickie" }]
+
+# v1 core is stdlib only. The MCP surface needs the SDK; yt-dlp is invoked as a
+# subprocess and is deliberately NOT a Python dependency.
+[project.optional-dependencies]
+mcp = ["mcp>=1.2"]
+
+[project.scripts]
+youtube = "youtube_plugin.cli:main"
+
+[tool.setuptools]
+packages = ["youtube_plugin"]

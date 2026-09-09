@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "youtube": {
+      "command": "${HOME}/.local/share/youtube-plugin/venv/bin/python",
+      "args": ["-m", "youtube_plugin.mcp_server"],
+      "env": {
+        "YOUTUBE_API_KEY": "${user_config.youtube_api_key}"
+      }
+    }
+  }
+}

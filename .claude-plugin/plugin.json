@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "youtube",
+  "version": "0.1.0",
+  "description": "Read YouTube through the official Data API for research and channel work. Activates for: (1) pulling comments off a video with replies fully resolved, (2) sweeping comments across a channel including competitors, (3) channel and video metadata, (4) transcripts, (5) exporting comments shaped for an Ultimate Message Map, routed per client. Ships both the `youtube` CLI and MCP tools over one core.",
+  "author": { "name": "Julian Dickie" },
+  "license": "MIT",
+  "keywords": ["youtube", "voc", "research", "comments", "transcripts", "cli", "mcp"],
+  "mcpServers": "./.mcp.json",
+  "userConfig": {
+    "youtube_api_key": {
+      "type": "string",
+      "title": "YouTube Data API Key",
+      "description": "API key from a Google Cloud project with YouTube Data API v3 enabled. Public reads only; no OAuth needed. Optional if you set it in ~/.config/youtube-plugin/config.toml instead.",
+      "sensitive": true,
+      "required": false
+    }
+  }
+}

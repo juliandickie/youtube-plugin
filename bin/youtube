@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# PATH wrapper. Execs the dedicated venv so callers never manage an environment.
+set -euo pipefail
+VENV="${YOUTUBE_PLUGIN_VENV:-$HOME/.local/share/youtube-plugin/venv}"
+if [ ! -x "$VENV/bin/python" ]; then
+  echo "youtube: venv missing at $VENV. Run scripts/install.sh from the repo." >&2
+  exit 127
+fi
+exec "$VENV/bin/python" -m youtube_plugin "$@"

@@ -57,6 +57,10 @@ def build_parser() -> argparse.ArgumentParser:
                    help="cap top-level comments per video")
     p.add_argument("--sort", default="discussed", choices=["recent", "popular", "discussed"],
                    help="which videos to sweep (default discussed, the best for VOC)")
+    p.add_argument("--pool", type=int, default=None,
+                   help="cap the candidate set that ranking happens over. Default is "
+                        "EVERY video on the channel, because ranking only the newest "
+                        "page is not ranking. Ignored for --sort recent.")
     p.add_argument("--yes", action="store_true", help="skip the quota confirmation")
     _add_output(p)
 
@@ -137,11 +141,26 @@ def cmd_sweep(args, cfg) -> int:
     if not args.yes:
         from .channels import plan_sweep
 
-        estimate = quota.estimate(plan_sweep(args.videos, args.comments_limit or 100))
+        # Resolve the channel first (1 unit, cached) so the estimate can include the
+        # ranking pool. Without its real size the estimate understates badly: on an
+        # 806-video channel it read 23 units for a run that cost 77.
+        pool_size = args.videos
+        if args.sort != "recent":
+            try:
+                channel = core.channel_info(cfg, args.channel, use_cache=not args.no_cache)
+                pool_size = args.pool or channel.video_count or args.videos
+            except YouTubeError:
+                pool_size = args.pool or args.videos
+
+        estimate = quota.estimate(
+            plan_sweep(args.videos, args.comments_limit or 100, pool_size=pool_size)
+        )
         remaining = quota.remaining()
         print(
-            f"Sweeping up to {args.videos} videos from {args.channel}.\n"
-            f"Rough estimate {estimate} units; {remaining} remaining today.",
+            f"Sweeping up to {args.videos} videos from {args.channel}, "
+            f"ranked over {pool_size} candidates.\n"
+            f"Estimated floor {estimate} units ({remaining} remaining today). "
+            f"Reply fetches are extra and cannot be predicted before fetching.",
             file=sys.stderr,
         )
         if estimate > remaining:
@@ -157,7 +176,7 @@ def cmd_sweep(args, cfg) -> int:
 
     channel, vids, totals = core.sweep(
         cfg, args.channel, videos_limit=args.videos, comments_limit=args.comments_limit,
-        sort_by=args.sort, use_cache=not args.no_cache, on_progress=progress,
+        sort_by=args.sort, pool=args.pool, use_cache=not args.no_cache, on_progress=progress,
     )
     print(json.dumps(totals, indent=2), file=sys.stderr)
     ext = "md" if args.format == "markdown" else "json"

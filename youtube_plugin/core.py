@@ -83,41 +83,68 @@ def sweep(
     videos_limit: int = 20,
     comments_limit: int | None = None,
     sort_by: str = "recent",
+    pool: int | None = None,
     use_cache: bool = True,
     api: Api | None = None,
     on_progress=None,
 ) -> tuple[object, list[Video], dict]:
     """Comments across a channel's videos. Works on any public channel.
 
-    `sort_by` picks which videos get swept: 'recent' (default), 'popular' by views,
-    or 'discussed' by comment count. For VOC, 'discussed' is usually the right call,
-    since a video with 400 comments carries more customer voice than a viral one
-    with none.
+    `sort_by` picks which videos get swept: 'recent', 'popular' by views, or
+    'discussed' by comment count. For VOC, 'discussed' is usually right, since a
+    video with 400 comments carries more customer voice than a viral one with none.
+
+    `pool` is the CANDIDATE set that ranking happens over, and it matters more than
+    it looks. Ranking only the newest page is not ranking: on a channel that posts
+    Shorts daily, the most-discussed of the newest 50 is still a pile of Shorts with
+    two comments, while the genuinely discussed videos sit years back. So for a
+    value-ranked sweep the pool defaults to EVERY video on the channel. That costs
+    1 unit per 50 videos to list plus 1 per 50 to hydrate, about 34 units on an
+    800-video channel, which is nothing against 10,000. Pass an int to cap it.
+
+    For sort_by='recent' the pool is just videos_limit, because newest-first needs
+    no ranking.
     """
     api = api or Api(config)
     quota = api.quota
+    pool_limit = videos_limit if sort_by == "recent" else pool
     channel, vids = channel_videos(
-        config, ref, limit=max(videos_limit, 50), hydrate=True, use_cache=use_cache, api=api
+        config, ref, limit=pool_limit, hydrate=True, use_cache=use_cache, api=api
     )
 
+    candidates = vids
     if sort_by == "popular":
-        vids.sort(key=lambda v: v.views or 0, reverse=True)
+        vids = sorted(candidates, key=lambda v: v.views or 0, reverse=True)
     elif sort_by == "discussed":
-        vids.sort(key=lambda v: v.comment_count or 0, reverse=True)
+        vids = sorted(candidates, key=lambda v: v.comment_count or 0, reverse=True)
     vids = vids[:videos_limit]
 
     estimate = quota.estimate(
-        channels_mod.plan_sweep(len(vids), avg_comments=comments_limit or 100)
+        channels_mod.plan_sweep(
+            len(vids), avg_comments=comments_limit or 100, pool_size=len(candidates)
+        )
     )
     totals = {
         "channel": channel.title,
+        "channel_video_count": channel.video_count,
+        "candidates_ranked": len(candidates),
+        "sorted_by": sort_by,
         "videos_swept": 0,
         "comments": 0,
         "replies_fetched": 0,
         "threads_needing_reply_fetch": 0,
-        "estimated_units": estimate,
+        "estimated_floor_units": estimate,
         "skipped": [],
     }
+    # Only warn when the caller actually capped the pool. A channel's video_count and
+    # its uploads playlist routinely differ by a few (private, removed, or members-only
+    # items), and blaming --pool for that would be a false alarm on every run.
+    if sort_by != "recent" and pool is not None and len(candidates) >= pool:
+        totals["ranking_note"] = (
+            f"Ranked {len(candidates)} of {channel.video_count} videos because --pool "
+            f"capped the candidate set at {pool}. The true top {videos_limit} may sit "
+            f"outside it."
+        )
 
     for index, video in enumerate(vids, start=1):
         if on_progress:

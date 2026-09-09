@@ -86,11 +86,25 @@ def hydrate(api: Api, videos_in: list[Video], *, use_cache: bool = True) -> list
     return videos_in
 
 
-def plan_sweep(video_count: int, avg_comments: int = 100) -> dict[str, int]:
-    """Estimated {method: calls} for a sweep, for the pre-flight quota check."""
+def plan_sweep(
+    video_count: int, avg_comments: int = 100, pool_size: int | None = None
+) -> dict[str, int]:
+    """Estimated {method: calls} for a sweep, for the pre-flight quota check.
+
+    `pool_size` is the candidate set that gets listed and hydrated for ranking, which
+    is usually far larger than the number of videos actually swept. Omitting it was a
+    real bug: an 806-video channel reported an estimate of 23 units for a run that
+    actually cost 77, because listing and hydrating the ranking pool was invisible.
+
+    Reply fetches are deliberately not modelled. They depend on how many threads
+    exceed their inline reply subset, which is unknowable before fetching, so this
+    is a floor rather than a forecast and the caller should say so.
+    """
+    pages = lambda n: max(1, -(-n // 50))  # noqa: E731 - ceil-divide, reads clearer inline
+    pool = pool_size if pool_size is not None else video_count
     return {
         "channels.list": 1,
-        "playlistItems.list": max(1, -(-video_count // 50)),
-        "videos.list": max(1, -(-video_count // 50)),
+        "playlistItems.list": pages(pool),
+        "videos.list": pages(pool),
         "commentThreads.list": video_count * max(1, -(-avg_comments // 100)),
     }

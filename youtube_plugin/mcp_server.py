@@ -85,18 +85,23 @@ def build():
     @server.tool()
     def youtube_sweep(
         channel: str, videos: int = 10, comments_per_video: int | None = 100,
-        sort: str = "discussed", output: str = "voc",
+        sort: str = "discussed", pool: int | None = None, output: str = "voc",
     ) -> str:
         """Comments across a channel's videos. Works on any public channel, including
         competitors. sort: discussed (best for research), popular, or recent.
 
-        Costs roughly one quota unit per video plus one per 100 comments. Check
-        youtube_quota first for a large sweep.
+        For discussed and popular, ranking spans EVERY video on the channel by
+        default, because ranking only the newest page returns whatever was posted
+        this week rather than what people actually discussed. pool caps that
+        candidate set if a channel is enormous.
+
+        Costs roughly one unit per 50 videos listed, one per 50 hydrated, then one
+        per 100 comments. Check youtube_quota first for a large sweep.
         """
         cfg = load_config()
         _, vids, totals = core.sweep(
             cfg, channel, videos_limit=videos,
-            comments_limit=comments_per_video, sort_by=sort,
+            comments_limit=comments_per_video, sort_by=sort, pool=pool,
         )
         with_comments = [v for v in vids if v.comments]
         body = formats.render(with_comments, output) if with_comments else "[]"

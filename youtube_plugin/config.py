@@ -24,6 +24,11 @@ QUOTA_PATH = CONFIG_DIR / "quota.json"
 
 DAILY_QUOTA = 10_000  # Google's default for the shared bucket.
 
+# The shipped config.toml carries a placeholder. Treat it as absent rather than
+# passing it to Google, which would return an opaque "API key not valid" instead of
+# telling the user they never pasted their key.
+PLACEHOLDERS = {"PASTE_YOUR_API_KEY_HERE", "YOUR_API_KEY", "CHANGEME", ""}
+
 # Per-method unit costs, from https://developers.google.com/youtube/v3/determine_quota_cost
 COSTS = {
     "channels.list": 1,
@@ -90,6 +95,8 @@ def load(path: Path | None = None) -> Config:
     op = yt.get("op", {})
 
     api_key = os.environ.get("YOUTUBE_API_KEY") or yt.get("api_key")
+    if api_key and api_key.strip() in PLACEHOLDERS:
+        api_key = None
     if not api_key and op.get("api_key_ref"):
         api_key = _resolve_op_ref(op["api_key_ref"], op.get("account"))
 

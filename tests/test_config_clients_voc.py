@@ -221,6 +221,22 @@ class TestConfigLoading(unittest.TestCase):
             Config().require_key()
         self.assertIn("YouTube Data API v3", str(ctx.exception))
 
+    def test_placeholder_key_counts_as_absent(self):
+        """The shipped config carries a placeholder. Sending it to Google would
+        return an opaque 'API key not valid' instead of saying it was never pasted."""
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "config.toml"
+            path.write_text('[youtube]\napi_key = "PASTE_YOUR_API_KEY_HERE"\n', encoding="utf-8")
+            with mock.patch.dict("os.environ", {}, clear=True):
+                self.assertIsNone(load(path).api_key)
+
+    def test_a_real_looking_key_is_kept(self):
+        with TemporaryDirectory() as tmp:
+            path = Path(tmp) / "config.toml"
+            path.write_text('[youtube]\napi_key = "AIzaSyRealLookingKey123"\n', encoding="utf-8")
+            with mock.patch.dict("os.environ", {}, clear=True):
+                self.assertEqual(load(path).api_key, "AIzaSyRealLookingKey123")
+
 
 if __name__ == "__main__":
     unittest.main()

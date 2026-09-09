@@ -61,7 +61,7 @@ def build():
     @server.tool()
     def youtube_comments(
         video: str, limit: int | None = None, output: str = "voc",
-        min_length: int = 80, keep_all: bool = False,
+        min_length: int = 80, keep_all: bool = False, lang: str | None = None,
     ) -> str:
         """Comments for one video with replies fully resolved.
 
@@ -70,7 +70,11 @@ def build():
         """
         cfg = load_config()
         v, stats = core.video_comments(cfg, video, limit=limit)
-        kwargs = {"min_length": min_length, "keep_all": keep_all} if output == "voc" else {}
+        kwargs = {}
+        if output == "voc":
+            kwargs = {"min_length": min_length, "keep_all": keep_all}
+            if lang:
+                kwargs["languages"] = [s.strip().lower() for s in lang.split(",")]
         return formats.render(v, output, **kwargs)
 
     @server.tool()

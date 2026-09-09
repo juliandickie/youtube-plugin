@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from . import language
 from .models import Comment, Video
 
 DEFAULT_MIN_LENGTH = 80
@@ -81,22 +82,37 @@ def _is_bot(author: str | None) -> bool:
     return author.strip().lower().endswith(BOT_SUFFIXES)
 
 
-def _drop_reason(comment: Comment, min_length: int, seen: set[str]) -> str | None:
+def _drop_reason(
+    comment: Comment, min_length: int, seen: set[str], languages: list[str] | None
+) -> tuple[str | None, str | None]:
+    """Return (drop_reason, detected_language). Language is recorded either way so a
+    drop can be audited rather than taken on trust."""
     body = comment.text.strip()
     if body.lower() in TOMBSTONES:
-        return "deleted_or_removed"
+        return "deleted_or_removed", None
     if _is_bot(comment.author):
-        return "bot"
+        return "bot", None
     if comment.is_author:
-        return "channel_owner"  # the brand replying to itself is not customer voice
+        return "channel_owner", None  # the brand replying to itself is not customer voice
     if len(body) < min_length:
-        return "below_min_length"
+        return "below_min_length", None
     if body in seen:
-        return "duplicate"
-    return None
+        return "duplicate", None
+    if languages:
+        keep, detected, _ = language.matches(body, languages)
+        if not keep:
+            return f"language_{detected}", detected
+        return None, detected
+    return None, None
 
 
-def shape(video: Video, *, min_length: int = DEFAULT_MIN_LENGTH, keep_all: bool = False) -> dict:
+def shape(
+    video: Video,
+    *,
+    min_length: int = DEFAULT_MIN_LENGTH,
+    keep_all: bool = False,
+    languages: list[str] | None = None,
+) -> dict:
     """One video and its comments to UMM-shaped records plus an audit."""
     audit = Audit()
     seen: set[str] = set()
@@ -105,7 +121,7 @@ def shape(video: Video, *, min_length: int = DEFAULT_MIN_LENGTH, keep_all: bool 
 
     for comment in video.comments:
         audit.considered += 1
-        reason = _drop_reason(comment, min_length, seen)
+        reason, detected = _drop_reason(comment, min_length, seen, languages)
         if reason and not keep_all:
             audit.drop(reason)
             continue
@@ -127,6 +143,7 @@ def shape(video: Video, *, min_length: int = DEFAULT_MIN_LENGTH, keep_all: bool 
                     "permalink": video.url,
                     "channel": video.channel_title,
                 },
+                "language": detected,
                 "umm": {"big_picture_tag": None, "granular_tag": None, "slot": None},
                 "prefilter": {"kept": True, "reason": reason} if keep_all and reason else {"kept": True},
             }

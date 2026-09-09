@@ -27,6 +27,11 @@ def _add_output(parser: argparse.ArgumentParser, *, voc: bool = True) -> None:
                             help="voc: minimum comment length to keep (default 80)")
         parser.add_argument("--keep-all", action="store_true",
                             help="voc: disable the mechanical prefilter")
+        parser.add_argument("--lang", default=None,
+                            help="voc: keep only these languages, comma separated "
+                                 "(e.g. en). Text too short to classify is always "
+                                 "kept, and every drop is audited with the language "
+                                 "that was detected.")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -90,6 +95,8 @@ def _voc_kwargs(args) -> dict:
         out["min_length"] = args.min_length
     if getattr(args, "keep_all", False):
         out["keep_all"] = True
+    if getattr(args, "lang", None):
+        out["languages"] = [s.strip().lower() for s in args.lang.split(",") if s.strip()]
     return out
 
 

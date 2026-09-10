@@ -157,3 +157,21 @@ youtube quota
 Done as part of this handoff, per the standing session-close authorisation
 (commit, push, merge, tag, never deploy). Exact end state recorded in the
 "After landing" section appended below.
+
+## After landing
+
+**Verified 2026-09-10 11:31 AEST by `git log` and `git status`.**
+
+| Repo | Branch | HEAD | Tag | Pushed | Dirty |
+|---|---|---|---|---|---|
+| `copy-school` | `main` | `31dc4ec` (merge commit) | none, repo does not version | yes | 3 untracked, parallel session's, left alone |
+| `reddit-plugin` | `main` | `d43258a` | `v0.1.0` | yes, incl. tag | clean |
+| `youtube-plugin` | `main` | `82bba9a` | `v0.1.0` | yes, incl. tag | clean |
+| `idd-world` | `cel26-flight-closeout-2026-08-31` | `98066b9` | untouched | n/a | **5, see In Flight** |
+
+- `copy-school`: `voc-capture-paths` merged to main with `--no-ff`, then deleted local
+  and remote. Lint 0 failures 0 warnings before the merge. The three untracked
+  10x-launches audit files were verified unchanged before and after the branch switch.
+- Both plugins tagged `v0.1.0`. Neither is listed on a marketplace and **nothing was
+  deployed**, which is a separate release decision.
+- `idd-world` was not touched. No commit, no branch, no checkout.

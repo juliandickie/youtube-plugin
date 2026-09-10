@@ -56,7 +56,7 @@ Then `--client idd` writes there. `--out` overrides. Neither means stdout.
 
 ```bash
 youtube comments https://youtu.be/E08EG1NiI5k --format voc --client idd
-youtube sweep @InstituteofDigitalDentistry --videos 20 --sort discussed --format voc
+youtube sweep @InstituteofDigitalDentistry --videos 20 --sort discussed --format voc --lang en
 youtube channel @SomeCompetitor --videos 50
 youtube captions <video> --via-yt-dlp
 youtube quota
@@ -82,6 +82,11 @@ corpus. The ledger counts this tool's own calls, not Google's view, and says so.
 Records shaped for the Ultimate Message Map: verbatim text plus permalink, author,
 likes, date, video and depth. The contract matches `reddit-plugin` exactly so corpora
 from both merge without transformation.
+
+`--lang en` keeps only the languages you name. Detection is a stdlib heuristic: script
+ranges settle non-Latin languages, stopword scoring handles the rest. Anything under six
+words, or any near-tie, returns "unknown" and is **kept**, because dropping on weak
+evidence loses real customer lines invisibly. Every drop is audited as `language_<code>`.
 
 **It does not apply the sticky-VOC filter.** That is an eyes-closed human judgement.
 The tool removes unambiguous noise only: deleted, bots, under 80 characters,
@@ -114,5 +119,6 @@ any-channel mode, so agency use needs each client to authorise.
 ~/.local/share/youtube-plugin/venv/bin/python -m unittest discover -s tests
 ```
 
-39 tests, no network. Design record in
+65 tests, no network. Session state and open work in
+`SESSION-HANDOFF-2026-09-10.md`. Design record in
 `docs/superpowers/specs/2026-09-09-youtube-plugin-design.md`.

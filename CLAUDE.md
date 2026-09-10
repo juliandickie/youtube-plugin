@@ -1,8 +1,9 @@
 # youtube-plugin - working notes
 
-Read `README.md` for usage and
+Read `README.md` for usage,
 `docs/superpowers/specs/2026-09-09-youtube-plugin-design.md` for why it is shaped this
-way, including the three lanes of research behind it.
+way including the three lanes of research behind it, and
+`SESSION-HANDOFF-2026-09-10.md` for where the work stopped and what is still open.
 
 ## Rules specific to this repo
 
@@ -22,9 +23,22 @@ prefilter and says so. A test asserts the wording.
 
 **Never modify captured text.** `voc.py` copies comment bodies verbatim.
 
+**Never rank a sweep over only the newest page.** `core.sweep` fetches EVERY video on
+the channel as the candidate set for discussed and popular. This looks like a wasteful
+default and is not: the first version capped the pool at 50, so on the 806-video iDD
+channel "most discussed" meant "most discussed among this week's Shorts" and returned
+20 videos carrying 2 comments between them. Listing and hydrating a whole channel costs
+about 34 units against 10,000.
+
 **Do not add `search.list`.** It sits in a 100-call-a-day bucket. Channel resolution
 by handle costs 1 unit. Adding search would look convenient and would exhaust in an
 afternoon.
+
+**The language filter must never drop on weak evidence.** `language.py` returns
+"unknown" (and keeps the record) for anything under six words or any near-tie, because
+English shares function words with its neighbours. Losing a real customer line to an
+over-eager filter is worse than keeping a stray foreign one, since the drop is invisible
+exactly where it matters.
 
 **Keep logic in `core.py`.** The CLI and MCP surfaces are both thin wrappers over it.
 Logic added to one surface only will drift.
@@ -50,3 +64,9 @@ thread shape first.
 - macOS has no `timeout` command; the yt-dlp subprocess carries its own.
 - Comment text uses `textOriginal`, not `textDisplay`, because the latter is
   HTML-escaped and would corrupt verbatim capture.
+- A channel's `video_count` and its uploads playlist routinely differ by a few (private,
+  removed, members-only). Do not warn about it; that fired a false alarm on every run.
+- The sweep pre-flight estimate resolves the channel first so the ranking pool is
+  included. Without it an 806-video sweep reported 23 units for a run that cost 77.
+- A placeholder API key is truthy. `config.PLACEHOLDERS` treats the shipped
+  `PASTE_YOUR_API_KEY_HERE` as absent so `doctor` says what is actually wrong.

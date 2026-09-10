@@ -175,3 +175,52 @@ Done as part of this handoff, per the standing session-close authorisation
 - Both plugins tagged `v0.1.0`. Neither is listed on a marketplace and **nothing was
   deployed**, which is a separate release decision.
 - `idd-world` was not touched. No commit, no branch, no checkout.
+
+---
+
+## Kickoff prompt for the next session
+
+```
+Working directory: ~/code
+Repos in play, all separate git repos, none nested:
+  ~/code/youtube-plugin   private, main @ 82bba9a+, tag v0.1.0, clean, WORKING
+  ~/code/reddit-plugin    private, main @ d43258a, tag v0.1.0, clean, BLOCKED externally
+  ~/code/copy-school      private, main @ 31dc4ec, clean except a parallel session's files
+  ~/code/idd-world        DO NOT TOUCH, see below
+
+READ FIRST, in this order, and treat them over any assumption:
+1. ~/code/youtube-plugin/SESSION-HANDOFF-2026-09-10.md
+2. ~/code/youtube-plugin/CLAUDE.md
+3. ~/code/idd-world/research/voc/README.md
+4. ~/code/idd-world/research/voc/ULTIMATE-MESSAGE-MAP.md
+
+State verified 2026-09-10 11:31 AEST. Verify it with git log before acting; if
+reality contradicts the handoff, surface the contradiction rather than
+reconciling it silently.
+
+DONE: both CLIs built, tested and pushed (65 and 27 tests). youtube is live
+against the Data API and produced a 458-record iDD VOC corpus across five
+channels for 440 quota units. 23 sticky lines tagged into an Ultimate Message
+Map. copy-school's capture-paths reference is merged to main.
+
+OPEN, ranked: (1) decide where ~/code/idd-world/research/voc/ lives, it is
+untracked and backed up nowhere; (2) list both plugins on outfit and loadout in
+lockstep; (3) Reddit API approval, externally blocked, needs Julian to file the
+ticket; (4) close the four research gaps named at the end of the message map;
+(5) youtube-plugin v2 OAuth for owned-channel analytics and captions.
+
+DO NOT TOUCH:
+- ~/code/idd-world is on another session's branch
+  (cel26-flight-closeout-2026-08-31) with four uncommitted files from that
+  stream. Another session's work, not yours to redo, commit, or branch off.
+- The three untracked 10x-launches audit files in copy-school are also a
+  parallel session's.
+
+Standing rules: verify against the live rendered artifact, never an exit code or
+a status line. Sonnet subagents for any fan-out, about 3 concurrent, explicit
+model on every call. Never push unasked. No em or en dashes, no colons in
+headings, straight quotes. Archive over delete.
+
+FIRST ACTION: ask Julian question 1 from the handoff (where the VOC corpus
+should live), because it is unbacked-up and blocks nothing else being safe.
+```

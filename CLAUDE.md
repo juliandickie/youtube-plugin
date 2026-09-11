@@ -7,8 +7,9 @@ way including the three lanes of research behind it, and
 (it chains back to `SESSION-HANDOFF-2026-09-10.md`, which explains how the tool came to
 be shaped).
 `docs/evaluations/` holds decision documents for sources this stream has not built for
-yet; `2026-09-11-apify-instagram-tiktok.md` is the Instagram and TikTok evaluation and the
-questions Julian has not yet answered on it.
+yet; `2026-09-11-apify-instagram-tiktok.md` is the Instagram and TikTok evaluation, now
+acted on: the `social` CLI lives at `~/code/social-plugin` and that repo's
+`SESSION-HANDOFF-2026-09-12.md` is the current handoff for this whole VOC stream.
 
 ## Rules specific to this repo
 

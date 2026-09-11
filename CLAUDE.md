@@ -3,7 +3,9 @@
 Read `README.md` for usage,
 `docs/superpowers/specs/2026-09-09-youtube-plugin-design.md` for why it is shaped this
 way including the three lanes of research behind it, and
-`SESSION-HANDOFF-2026-09-10.md` for where the work stopped and what is still open.
+`SESSION-HANDOFF-2026-09-11.md` for where the work stopped and what is still open
+(it chains back to `SESSION-HANDOFF-2026-09-10.md`, which explains how the tool came to
+be shaped).
 
 ## Rules specific to this repo
 

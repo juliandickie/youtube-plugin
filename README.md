@@ -6,6 +6,15 @@ CLI and MCP tools over one core.
 
 ## Install
 
+As a Claude Code plugin, from either of Julian's catalogs:
+
+```
+/plugin marketplace add juliandickie/outfit
+/plugin install youtube@outfit
+```
+
+Or straight from the repo, which is also how the plugin's own scripts set up the CLI:
+
 ```bash
 bash scripts/install.sh
 ```

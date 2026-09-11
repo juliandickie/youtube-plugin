@@ -6,6 +6,9 @@ way including the three lanes of research behind it, and
 `SESSION-HANDOFF-2026-09-11.md` for where the work stopped and what is still open
 (it chains back to `SESSION-HANDOFF-2026-09-10.md`, which explains how the tool came to
 be shaped).
+`docs/evaluations/` holds decision documents for sources this stream has not built for
+yet; `2026-09-11-apify-instagram-tiktok.md` is the Instagram and TikTok evaluation and the
+questions Julian has not yet answered on it.
 
 ## Rules specific to this repo
 

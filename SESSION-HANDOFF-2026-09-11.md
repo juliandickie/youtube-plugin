@@ -23,8 +23,8 @@ raw-file reads, not from conversation memory.
 
 | Repo | Branch | HEAD | Tag | Pushed | Dirty | Visibility |
 |---|---|---|---|---|---|---|
-| `youtube-plugin` | `main` | `a4d7d85` | `v0.2.0` (and `v0.1.0`, both rewritten) | yes, incl. tags | clean | **PUBLIC** since 2026-09-11 |
-| `reddit-plugin` | `main` | `4676700` | `v0.1.0` | yes | clean | **PUBLIC** since 2026-09-11 |
+| `youtube-plugin` | `main` | `1a19040` plus one docs commit carrying this handoff | `v0.2.0` (and `v0.1.0`, both rewritten) | yes, incl. tags | clean | **PUBLIC** since 2026-09-11 |
+| `reddit-plugin` | `main` | `e51e353` | `v0.1.0` | yes | clean | **PUBLIC** since 2026-09-11 |
 | `plugins` (outfit) | `main` | `614bb21` | n/a | yes | clean | public |
 | `ai-loadout` (loadout) | `main` | `6f71b1d` | n/a | yes | clean | public |
 | `idd-world` | `main` | `caf7d75` (merge of PR #43) | untouched | yes | clean | org repo |
@@ -152,8 +152,8 @@ None outstanding. Everything asked this session was answered and acted on.
 ```
 Working directory: ~/code
 Repos in play, all separate git repos, none nested:
-  ~/code/youtube-plugin   PUBLIC, main @ a4d7d85, tag v0.2.0, clean
-  ~/code/reddit-plugin    PUBLIC, main @ 4676700, tag v0.1.0, clean, BLOCKED on a Reddit ticket
+  ~/code/youtube-plugin   PUBLIC, main @ 1a19040 plus the handoff commit, tag v0.2.0, clean
+  ~/code/reddit-plugin    PUBLIC, main @ e51e353, tag v0.1.0, clean, BLOCKED on a Reddit ticket
   ~/code/idd-world        org repo, main @ caf7d75, clean; VOC corpus landed at
                           research/general/ (PR #43); branch per stream, PR, never commit to main
   ~/code/plugins and ~/code/ai-loadout   catalogs, both list youtube and reddit, clean

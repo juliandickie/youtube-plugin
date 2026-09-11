@@ -11,6 +11,7 @@ from __future__ import annotations
 import json
 
 from . import core, formats
+from .cli import parse_languages
 from .config import load as load_config
 
 INSTRUCTIONS = """Read YouTube for research via the official Data API.
@@ -55,27 +56,35 @@ def _server_class():
         ) from exc
 
 
+def _voc_kwargs(output: str, min_length: int, keep_all: bool, lang: str | None) -> dict:
+    """Render kwargs for the voc format. Same rules as the CLI: lang defaults to en,
+    "all" disables the language filter. Other formats take no kwargs."""
+    if output != "voc":
+        return {}
+    kwargs = {"min_length": min_length, "keep_all": keep_all}
+    languages = parse_languages(lang)
+    if languages:
+        kwargs["languages"] = languages
+    return kwargs
+
+
 def build():
     server = _server_class()("youtube", instructions=INSTRUCTIONS)
 
     @server.tool()
     def youtube_comments(
         video: str, limit: int | None = None, output: str = "voc",
-        min_length: int = 80, keep_all: bool = False, lang: str | None = None,
+        min_length: int = 80, keep_all: bool = False, lang: str = "en",
     ) -> str:
         """Comments for one video with replies fully resolved.
 
         video: URL or 11-character id. limit caps TOP-LEVEL comments (whole threads
-        are kept). output: json, markdown, or voc.
+        are kept). output: json, markdown, or voc. lang: comma separated language
+        codes to keep in voc output, default en; pass "all" to keep every language.
         """
         cfg = load_config()
         v, stats = core.video_comments(cfg, video, limit=limit)
-        kwargs = {}
-        if output == "voc":
-            kwargs = {"min_length": min_length, "keep_all": keep_all}
-            if lang:
-                kwargs["languages"] = [s.strip().lower() for s in lang.split(",")]
-        return formats.render(v, output, **kwargs)
+        return formats.render(v, output, **_voc_kwargs(output, min_length, keep_all, lang))
 
     @server.tool()
     def youtube_channel(channel: str, videos: int = 0) -> str:
@@ -90,9 +99,12 @@ def build():
     def youtube_sweep(
         channel: str, videos: int = 10, comments_per_video: int | None = 100,
         sort: str = "discussed", pool: int | None = None, output: str = "voc",
+        min_length: int = 80, keep_all: bool = False, lang: str = "en",
     ) -> str:
         """Comments across a channel's videos. Works on any public channel, including
-        competitors. sort: discussed (best for research), popular, or recent.
+        competitors. sort: discussed (best for research), popular, or recent. lang:
+        comma separated language codes to keep in voc output, default en; pass
+        "all" to keep every language.
 
         For discussed and popular, ranking spans EVERY video on the channel by
         default, because ranking only the newest page returns whatever was posted
@@ -108,7 +120,8 @@ def build():
             comments_limit=comments_per_video, sort_by=sort, pool=pool,
         )
         with_comments = [v for v in vids if v.comments]
-        body = formats.render(with_comments, output) if with_comments else "[]"
+        kwargs = _voc_kwargs(output, min_length, keep_all, lang)
+        body = formats.render(with_comments, output, **kwargs) if with_comments else "[]"
         return json.dumps({"totals": totals, "data": json.loads(body) if output != "markdown" else body}, indent=2)
 
     @server.tool()

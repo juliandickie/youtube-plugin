@@ -41,7 +41,7 @@ research should land:
 ```toml
 [clients.idd]
 name = "Institute of Digital Dentistry"
-path = "~/code/idd-world/research/voc"
+path = "~/code/idd-world/research/general/source-docs/voc-youtube"
 channels = ["@InstituteofDigitalDentistry"]
 competitors = ["@SomeCompetitor"]
 
@@ -56,7 +56,7 @@ Then `--client idd` writes there. `--out` overrides. Neither means stdout.
 
 ```bash
 youtube comments https://youtu.be/E08EG1NiI5k --format voc --client idd
-youtube sweep @InstituteofDigitalDentistry --videos 20 --sort discussed --format voc --lang en
+youtube sweep @InstituteofDigitalDentistry --videos 20 --sort discussed --format voc
 youtube channel @SomeCompetitor --videos 50
 youtube captions <video> --via-yt-dlp
 youtube quota
@@ -83,7 +83,9 @@ Records shaped for the Ultimate Message Map: verbatim text plus permalink, autho
 likes, date, video and depth. The contract matches `reddit-plugin` exactly so corpora
 from both merge without transformation.
 
-`--lang en` keeps only the languages you name. Detection is a stdlib heuristic: script
+The language filter defaults to English: `--lang en` is implied on voc output,
+`--lang en,de` keeps the languages you name, and `--lang all` keeps everything.
+Detection is a stdlib heuristic: script
 ranges settle non-Latin languages, stopword scoring handles the rest. Anything under six
 words, or any near-tie, returns "unknown" and is **kept**, because dropping on weak
 evidence loses real customer lines invisibly. Every drop is audited as `language_<code>`.

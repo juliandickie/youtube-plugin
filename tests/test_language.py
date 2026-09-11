@@ -90,3 +90,41 @@ class TestFilterInVoc(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLangDefault(unittest.TestCase):
+    """--lang defaults to en on voc output and "all" is the explicit opt-out.
+
+    Julian's call on 2026-09-11: every corpus gathered so far wanted English and the
+    opt-in flag was forgotten more than once. A non-English client passes their own
+    codes or "all"; nothing silently filters a non-voc format.
+    """
+
+    def _kwargs(self, argv):
+        from youtube_plugin.cli import _voc_kwargs, build_parser
+
+        return _voc_kwargs(build_parser().parse_args(argv))
+
+    def test_voc_defaults_to_english(self):
+        self.assertEqual(self._kwargs(["comments", "x", "--format", "voc"])["languages"], ["en"])
+
+    def test_all_disables_the_filter(self):
+        self.assertNotIn("languages", self._kwargs(["sweep", "@x", "--format", "voc", "--lang", "all"]))
+
+    def test_all_inside_a_list_still_disables(self):
+        self.assertNotIn("languages", self._kwargs(["comments", "x", "--format", "voc", "--lang", "en,all"]))
+
+    def test_codes_are_normalised(self):
+        self.assertEqual(self._kwargs(["comments", "x", "--format", "voc", "--lang", " en, De "])["languages"], ["en", "de"])
+
+    def test_non_voc_formats_take_no_language_kwargs(self):
+        self.assertEqual(self._kwargs(["comments", "x"]), {})
+        self.assertEqual(self._kwargs(["comments", "x", "--format", "markdown", "--lang", "de"]), {})
+
+    def test_parse_languages_edge_cases(self):
+        from youtube_plugin.cli import parse_languages
+
+        self.assertIsNone(parse_languages(None))
+        self.assertIsNone(parse_languages(""))
+        self.assertIsNone(parse_languages(" , "))
+        self.assertEqual(parse_languages("fr"), ["fr"])

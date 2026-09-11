@@ -51,6 +51,20 @@ class TestMcpSurface(unittest.TestCase):
         self.assertIn("you must not report that it did", flat)
         self.assertIn("outside the official api", flat)
 
+    def test_voc_tools_default_to_english_with_all_as_opt_out(self):
+        """The MCP surface must carry the same language default as the CLI, or the two
+        surfaces drift and a sweep from Claude quietly keeps every language."""
+        from youtube_plugin.mcp_server import _voc_kwargs
+
+        tools = {t.name: t for t in asyncio.run(build().list_tools())}
+        for name in ("youtube_comments", "youtube_sweep"):
+            schema = getattr(tools[name], "inputSchema", None) or tools[name].input_schema
+            props = schema["properties"]
+            self.assertEqual(props["lang"]["default"], "en", name)
+        self.assertEqual(_voc_kwargs("voc", 80, False, "en")["languages"], ["en"])
+        self.assertNotIn("languages", _voc_kwargs("voc", 80, False, "all"))
+        self.assertEqual(_voc_kwargs("json", 80, False, "en"), {})
+
 
 if __name__ == "__main__":
     unittest.main()

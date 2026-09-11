@@ -7,7 +7,7 @@ Example ~/.config/youtube-plugin/clients.toml
 
     [clients.idd]
     name = "Institute of Digital Dentistry"
-    path = "~/code/idd-world/research/voc"
+    path = "~/code/idd-world/research/general/source-docs/voc-youtube"
     channels = ["@InstituteofDigitalDentistry"]
     competitors = ["@DigitalSmileDesignOfficial"]
 

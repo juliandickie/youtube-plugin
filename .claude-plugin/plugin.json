@@ -1,7 +1,7 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
   "name": "youtube",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Read YouTube through the official Data API for research and channel work. Activates for: (1) pulling comments off a video with replies fully resolved, (2) sweeping comments across a channel including competitors, (3) channel and video metadata, (4) transcripts, (5) exporting comments shaped for an Ultimate Message Map, routed per client. Ships both the `youtube` CLI and MCP tools over one core.",
   "author": { "name": "Julian Dickie" },
   "license": "MIT",

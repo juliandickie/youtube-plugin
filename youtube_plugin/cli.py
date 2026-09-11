@@ -14,7 +14,7 @@ from .captions import yt_dlp_available
 from .config import CLIENTS_PATH, CONFIG_PATH, ConfigError, Quota
 from .config import load as load_config
 
-VERSION = "0.1.0"
+VERSION = "0.2.0"
 
 
 def _add_output(parser: argparse.ArgumentParser, *, voc: bool = True) -> None:
@@ -27,11 +27,12 @@ def _add_output(parser: argparse.ArgumentParser, *, voc: bool = True) -> None:
                             help="voc: minimum comment length to keep (default 80)")
         parser.add_argument("--keep-all", action="store_true",
                             help="voc: disable the mechanical prefilter")
-        parser.add_argument("--lang", default=None,
-                            help="voc: keep only these languages, comma separated "
-                                 "(e.g. en). Text too short to classify is always "
-                                 "kept, and every drop is audited with the language "
-                                 "that was detected.")
+        parser.add_argument("--lang", default="en",
+                            help="voc: keep only these languages, comma separated. "
+                                 "Defaults to en; pass 'all' to keep every language. "
+                                 "Text too short to classify is always kept, and "
+                                 "every drop is audited with the language that was "
+                                 "detected.")
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -95,9 +96,26 @@ def _voc_kwargs(args) -> dict:
         out["min_length"] = args.min_length
     if getattr(args, "keep_all", False):
         out["keep_all"] = True
-    if getattr(args, "lang", None):
-        out["languages"] = [s.strip().lower() for s in args.lang.split(",") if s.strip()]
+    languages = parse_languages(getattr(args, "lang", None))
+    if languages:
+        out["languages"] = languages
     return out
+
+
+def parse_languages(value) -> list[str] | None:
+    """Turn a --lang value into a language list, or None for no filtering.
+
+    The default is "en" because every corpus gathered so far wanted it and an
+    opt-in flag was forgotten more than once. "all" is the explicit opt-out, so a
+    non-English client passes their own codes or "all" rather than relying on an
+    absent flag.
+    """
+    if value is None:
+        return None
+    codes = [s.strip().lower() for s in str(value).split(",") if s.strip()]
+    if not codes or "all" in codes:
+        return None
+    return codes
 
 
 def _emit(data, args, filename: str) -> int:

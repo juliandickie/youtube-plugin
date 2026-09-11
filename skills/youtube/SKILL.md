@@ -30,7 +30,7 @@ youtube clients
 ```
 
 Global flags: `--format json|markdown|voc`, `--client <slug>`, `--out <path>`,
-`--limit`, `--no-cache`.
+`--limit`, `--no-cache`, and for voc output `--lang <codes|all>` (default `en`).
 
 ## Comments, and why this beats fetching the page
 
@@ -74,6 +74,10 @@ CLI removes unambiguous noise only: deleted comments, bots, comments under 80
 characters, exact duplicates, and comments by the channel owner (the brand replying to
 itself is not customer voice). Every drop is counted by reason in the `audit` block.
 `--keep-all` disables it, `--min-length` changes the threshold.
+
+The language filter defaults to English. `--lang all` keeps every language, `--lang
+en,de` names the ones to keep. Anything too short to classify is always kept, and
+every language drop is counted in the audit as `language_<code>`.
 
 Applying the real filter is your job. Load the `voc-research` skill, specifically
 `references/06-filtering-and-processing.md`. Expect roughly 3 to 4 sticky lines per

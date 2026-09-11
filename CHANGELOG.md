@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 - 2026-09-11
+
+- The voc language filter now defaults to English on both the CLI and the MCP
+  tools. `--lang all` (or `lang="all"`) is the explicit opt-out; a list of codes
+  still works. Every corpus so far wanted `en` and the opt-in flag was forgotten more
+  than once. `youtube_sweep` on the MCP surface gains `min_length`, `keep_all` and
+  `lang`, matching `youtube_comments`.
+- The example `clients.toml` uses a fictional agency client rather than a real one.
+
 ## 0.1.0 - 2026-09-09
 
 Initial build. Public-data engine, API key only.

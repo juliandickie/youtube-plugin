@@ -40,6 +40,11 @@ English shares function words with its neighbours. Losing a real customer line t
 over-eager filter is worse than keeping a stray foreign one, since the drop is invisible
 exactly where it matters.
 
+**The language filter defaults to English.** Since 2026-09-11 voc output implies
+`--lang en` on both surfaces and `--lang all` is the explicit opt-out. Julian's call:
+every corpus so far wanted it and an opt-in flag was forgotten. Keep the two surfaces
+in step; `parse_languages` in `cli.py` is the one place the rule lives.
+
 **Keep logic in `core.py`.** The CLI and MCP surfaces are both thin wrappers over it.
 Logic added to one surface only will drift.
 

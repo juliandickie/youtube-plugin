@@ -101,7 +101,7 @@ the Free tier where tiered.
 | apify/instagram-scraper (official, general) | Free tier USD 0.0027 per result | Paid plans only | Free plan: "only the top 15 comments sorted by newest" | 390,000 users, 192 million runs |
 | apify/instagram-post-scraper (official) | Free tier USD 0.0017 per post | Preview only | "first and latest comments" only, not a comment tool | 127,000 users |
 | apify/instagram-reel-scraper (official) | Free tier USD 0.0026 per reel, plus per-event extras | Preview only | "up to 10 latest comments"; the page itself points to the comment scraper for the rest | 143,000 users |
-| scrapesmith/instagram-comments-scraper | USD 0.50 per 1,000, flat, plus USD 0.00005 per run. SPOT-CHECKED | Yes, nested `replies` array and `repliesCount`. SPOT-CHECKED | `maxCommentsPerPost`, no hard cap | 2,000 users, 90,000 runs, 100% stated success, 4.41 from 18 reviews, created 2025-10-31 |
+| scrapesmith/instagram-comments-scraper | USD 0.50 per 1,000, flat, plus USD 0.00005 per run. SPOT-CHECKED. **Refuses Free-plan accounts**: README, "free accounts are limited to 0 results per run on this Actor. Upgrade to a paid plan"; confirmed by the 2026-09-12 pilot run log, "FREE USER detected: hard capped at 0". Missed on 2026-09-11. | Yes, nested `replies` array and `repliesCount`. SPOT-CHECKED | `maxCommentsPerPost`, no hard cap | 2,000 users, 90,000 runs, 100% stated success, 4.41 from 18 reviews, created 2025-10-31 |
 | supreme_coder/instagram-comments-scraper | Free tier USD 0.001 per comment, USD 0.0003 on any paid tier | Yes, `scrapeReplies` with thread depth | `limitPerSource` | 529 users, 3.63 from 4 reviews, created 2026-06-24 |
 | api-empire/instagram-comments-scraper | not checked | not checked | not checked | Needs a `sessionId` cookie from your own Instagram account. Disqualified on that alone: it puts an iDD login into the scrape. |
 
@@ -363,3 +363,119 @@ YouTube corpus because scanner buyers narrate purchase decisions under review vi
 dentists, assistants and hygienists complain about work: educators, clinical influencers,
 dental humour accounts, and assistant and hygienist communities. Candidate discovery is the
 first step of the build, before the pilot account is chosen.
+
+## Pilot, 2026-09-12
+
+Julian picked **dentistry_humor** (Instagram, 256K followers, hygienist-run humour
+page) over 3Shape, for the widened purpose. Dry run estimate USD 2.34 (200 posts
+listed at 0.0017, 4,000 comments at 0.0005, one run fee). He gave the go and the
+sweep ran at 03:22 UTC.
+
+| Stage | Actor | Result | Actual USD |
+|---|---|---|---|
+| Ranking | apify/instagram-post-scraper 0.0.598 | 200 posts listed, `commentsCount` present on all | 0.306 |
+| Comments | scrapesmith/instagram-comments-scraper 0.0.168 | run SUCCEEDED, exit 0, **0 items** | 0.00005 |
+
+The comments actor's log: "FREE USER detected: hard capped at 0", "USER LIMIT
+REACHED! Dataset has 0 items (limit: 0)". Its README says the same in words; the
+evaluation above read the price row and missed the gate. So the pilot produced no
+comments and USD 0.306 bought the ranking only.
+
+What the ranking showed, and it changes the sizing: the 20 most-discussed
+dentistry_humor posts carry **43,046 comments** between them (top post 11,865, 20th
+605; all 200 listed posts, 66,288). The 200-per-post cap, not the account, bounds the
+yield. Every one of the 20 is a reel, most tagging @jerry_rdh, on office friction
+(phones in the chair, copay complaints, sterilization, assistants administering local
+anaesthetic in Oregon and Nevada), which is exactly the complaint register the
+widened purpose asked for.
+
+Options put to Julian, with the Free-plan prices read live from each actor's
+`pricingInfos`: supreme_coder at USD 0.001 per comment on Free (replies included,
+529 users), the official actor at USD 0.0023 on Free (replies for paying users only),
+or a plan upgrade keeping scrapesmith at USD 0.0005. **Decision: upgrade to Starter
+and keep scrapesmith**, no tool change to the actor wiring. The official actor's
+README now quotes Starter at USD 29 a month (the 2026-09-11 read of apify.com/pricing
+said USD 19); the console price at upgrade time governs.
+
+Tool consequence, built the same day (social-plugin, unreleased): a paid run that
+succeeds with zero items now raises on every paid path, naming the run, the money
+already spent, and the actor's own log lines. The tool had reported "20 ranked posts
+ended up with no comments" and never said why.
+
+### The second run, on Starter
+
+Julian upgraded in the console (Starter, USD 19 credit a month, so the 2026-09-11 price
+read was right after all). Same command, 03:36 to 03:40 UTC.
+
+| Stage | Result | Estimate USD | Actual USD at finish | Settled USD |
+|---|---|---|---|---|
+| Ranking, 200 posts | 200 listed, `commentsCount` on all | 0.34 | 0.27 | 0.30 |
+| Comments, 20 posts x 200 | 4,000 items, all attributed, none unmatched | 2.00005 | 1.90005 | 2.00005 (4,000 items plus one start event) |
+
+Estimate-versus-actual: the comments estimate was exact once billing settled; the
+ranking came in under (the post scraper settled at 0.0015 per post on Starter against
+the 0.0017 Free tier price configured; the first attempt's ranking, on Free, settled at
+exactly 0.34). Whole pilot, both attempts, settled: USD 2.64. Two findings for the tool: `usageTotalUsd` read the moment a run
+finishes can lag the settled figure by a minute, so `social spend --refresh` was added;
+and scrapesmith returned **no replies at all** (1,396 advertised by `repliesCount`, zero
+in `replies`), so the "nested replies" claim in the actor table above held for the output
+schema and not for a run. `totals.replies_advertised` now records that gap.
+
+**Yield.** 485 of 4,000 kept by the mechanical prefilter (3,501 under 80 characters,
+which is what "popular" order surfaces on a humour page). All 485 read in full. The
+corpus is US hygienists and assistants on scope-of-practice bills (Arizona assistants
+scaling, Oregon assistants giving local anaesthetic, Nevada on-the-job hygienists), pay,
+burnout, DSOs and insurance reimbursement; patients on the cost of extractions and
+braces removal; and reactions to the humour. No scanner, CAD/CAM or digital-workflow
+voice. Against the map's four gaps: nothing on Pulls of the New, nothing on the
+independence objection, no sales-call VOC; the assistant persona gains a strong second
+channel (the register matches: overworked, underpaid, blamed) but on scaling and
+anaesthesia, not scanning. One course-demand signal iDD does not serve: assistants
+asking for a real certification pathway to anaesthesia and scaling.
+
+**Decision the pilot supports.** The pipeline works and the price is as estimated; the
+account was the wrong one for the scanner map and the right one for "what dental staff
+complain about". The next paid sweeps should be the digital-education comparators and
+the scanner brands (digitaldentalacademy, dentistry.ohis, exocadofficial, 3shape), which
+is where course-relevant voice will be. Julian's call on which, and on whether a second
+humour or hygienist account is worth about USD 2.30 for the persona alone.
+
+### Four more accounts the same afternoon
+
+Julian named dr.mostafa.salah, dr.wallyrenne, drmichaeldefee and themodinstitute (all
+verified live in the in-app browser, 134K, 52.3K, 27.8K and 27.2K followers, all digital
+dentistry educators) and said "Do all four and go back to 50 posts each, unlikely to
+have over 200 comments on any of their posts". The tool's cap was raised from USD 5 to
+USD 19 because the estimate is a ceiling (5.34 per account at 50 posts) and the guard
+refuses on the ceiling.
+
+| Account | Comments | Kept | Ranking USD | Comments USD | Ceiling |
+|---|---|---|---|---|---|
+| dr.mostafa.salah | 2,644 | 4 | 0.30 | 1.32 | 5.34 |
+| dr.wallyrenne | 1,432 | 132 | 0.30 | 0.72 | 5.34 |
+| drmichaeldefee | 1,852 | 177 | 0.30 | 0.93 | 5.34 |
+| themodinstitute | 583 | 50 | 0.30 | 0.29 | 5.34 |
+
+Settled figures; every comments run billed exactly 0.0005 per item, every Starter
+ranking 0.30. Julian's reading was right: no account had 200 comments on a post, so
+actual spend was 8 to 30 percent of the ceiling. Day total, both pilot attempts and all
+five accounts, USD 7.10 settled.
+
+Two things the sweeps taught beyond the pilot. dr.wallyrenne and drmichaeldefee post
+collaboratively, so 101 kept records (31 posts) came back under both handles and were
+paid for twice; corpora must be deduplicated on comment id before anything is counted
+across files. And dr.mostafa.salah's audience is Arabic-speaking dental students
+leaving reactions under 20 characters; 2,644 comments produced four usable English
+lines, the worst yield of the day and not a target for an English corpus.
+
+**Verdict on yield.** The MOD Institute trio is the digital dentistry voice the YouTube
+corpus lacked: dentists asking which resin, which printer, exocad settings, how long to
+design and print, post-processing and curing steps, material longevity; course
+questions aimed at MOD Pro; scepticism about printed restorations; alumni testimonials
+and an Australian MOD faculty appointment. That is course-relevant voice and competitor
+intelligence at once, for about USD 1 per account. dentistry_humor is the assistant
+persona's second channel and nothing else. The pipeline, the prices and the cap all
+behaved; the two remaining tool gaps are replies (none returned by this actor on any
+of the five accounts) and a free re-shape from an existing Apify dataset so a lower
+length floor or another language does not cost a second run.
+

@@ -479,3 +479,47 @@ behaved; the two remaining tool gaps are replies (none returned by this actor on
 of the five accounts) and a free re-shape from an existing Apify dataset so a lower
 length floor or another language does not cost a second run.
 
+### Four more accounts the same evening, Julian's pick
+
+Offered the map synthesis or the next paid sweep, Julian chose the sweep, and from the
+seven obvious candidates (the three digital-education comparators plus the four scanner
+brands the 2026-09-11 brief had excluded) took the three comparators plus 3shape as a
+triangulation check on the abandonment finding. All seven were read live, logged out,
+before the dry runs were shown; every dry run read the same ceiling, USD 5.34005 at 50
+posts from a 200 pool. The four ran sequentially, 13:22 to 13:35 UTC, into a fresh
+idd-world worktree via `--out`.
+
+| Account | Comments | Kept | Ranking USD | Comments USD | Replies advertised |
+|---|---|---|---|---|---|
+| digitaldentalacademy | 29 | 3 | 0.30 | 0.01455 | 5 |
+| dentistry.ohis | 215 | 1 | 0.30 | 0.10755 | 193 |
+| exocadofficial | 1,043 | 47 | 0.30 | 0.52155 | 734 |
+| 3shape | 229 | 20 | 0.30 | 0.11455 | 105 |
+
+Settled figures from `social spend --refresh`; at-finish read 0.288 against 0.30 on
+three of the four rankings again. Session total USD 1.96, cycle USD 9.07 of 19. Every
+comments run billed exactly 0.0005 per item plus the 0.00005 start. Replies again zero
+returned on every account.
+
+**What the four taught about picking accounts.** Follower count predicts nothing.
+IDDA (35.9K) and OHI-S (29.4K) are institutional feeds whose most-discussed posts carry
+6 and 58 comments, nearly all reactions; USD 0.31 and 0.41 bought 3 and 1 records, and
+the fixed USD 0.30 ranking stage is the whole cost of a dud, unavoidable without a free
+pre-probe of comment counts (the logged-out profile page does not expose them as
+text). exocadofficial (108K) turned out to be a network of 26 collaborating designers
+and clinicians, which is where the sentences were: 47 records of exocad workflow voice
+and course demand at USD 0.82. 3shape (86.5K) gave 20 records that are the abandonment
+finding from a second channel of the same brand (support, repair waits, a years-old
+feature request, the Chinese-scanner price push) for USD 0.41, and one of its pool posts
+is a 3Shape collaboration with iDD's own account. Two exocad records carry commenter
+email addresses inside the comment text; the corpus README records that they must not
+be copied out. Cross-file overlap grew: exocad shares five records with the MOD files
+through the same collaborative posts, so the dedupe-on-id rule applies across all nine
+files (919 records, 805 unique).
+
+**Tool consequence.** None required; the pipeline, the guard, the ledger and the
+settled-versus-at-finish refresh all behaved. One idea for the backlog: a per-post
+`comment_count` distribution printed after the ranking stage and before the comments
+stage, so a thin pool (top post under, say, 20 comments) can be stopped before the
+comments run, which would not have saved the ranking cost on IDDA but would have made
+the dud visible a minute earlier.

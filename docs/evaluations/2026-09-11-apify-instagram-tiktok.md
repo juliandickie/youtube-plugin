@@ -523,3 +523,38 @@ settled-versus-at-finish refresh all behaved. One idea for the backlog: a per-po
 stage, so a thin pool (top post under, say, 20 comments) can be stopped before the
 comments run, which would not have saved the ranking cost on IDDA but would have made
 the dud visible a minute earlier.
+
+### The replies probe and the free re-shape, 2026-09-13
+
+Two half-cent probes settled the replies question. Target: drmichaeldefee's post
+DVLoiFnDrAc, whose 200-comment pull in the afternoon sweep advertised 217 replies and
+returned none, and which carries 35 filed Persona C lines. Ten comments each.
+
+| Probe | sortOrder | Advertised replies | Returned | Settled USD |
+|---|---|---|---|---|
+| 5bBSMGCYfJt9K1RvK | recent | 0 | 0 | 0.00505 |
+| aG9j0xC9oxDAz4nj5 | popular | 71 | 0 | 0.00505 |
+
+The first attempt did not run at all: Apify rejected `sortOrder = "recent_activity"`
+with HTTP 400 `invalid-input` before any money moved. The actor's input schema
+enforces `["popular", "recent"]`; the value the tool carried since 2026-09-11 came from
+the field's own description text, which still says `'recent_activity'`. Fixed in
+social-plugin (the enum is now pinned by a test) and recorded in its CLAUDE.md.
+
+**Verdict.** scrapesmith never fills `replies`, whatever the sort order or the cap.
+Neither variable the 2026-09-12 handoff named makes a difference. Threads need a
+second actor role with its own input builder and normaliser: `supreme_coder/
+instagram-comments-scraper` (`scrapeReplies`, USD 0.0003 per comment on a paid plan)
+or the official `apify/instagram-comment-scraper` (`includeNestedComments`, replies for
+paying plans, which Starter is). Both are priced in the actor table above; neither has
+been run. Every Persona C question in the map stays filed without its answer until one
+is.
+
+**Tool consequence, built the same day (social-plugin, unreleased).** `--from-run
+<run-id>` re-shapes the dataset of an earlier run for free: no actor, no guard, no
+ledger entry, provenance stamped from the original run and the audit carrying its
+settled cost with a note. Verified by re-shaping the drmichaeldefee run at the default
+floor, which reproduced the landed corpus record for record (177 kept of 1,852,
+identical drop counts), and at a 40-character floor, which kept 438. The 80-character
+floor decision, and dr.mostafa.salah's 2,644 comments in any language, can now be
+looked at without a second paid run. Cycle after the probes: USD 9.08 of 19 settled.
